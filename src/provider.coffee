@@ -31,7 +31,7 @@ class Provider
   # Returns true/false if is valid
   #
   # Sets up request variables for easier access down the line
-  valid_request: (req, body, callback) =>
+  valid_request: (isProvider, req, body, callback) =>
     if not callback
       callback = body
       body = undefined
@@ -44,7 +44,7 @@ class Provider
     if not @_valid_parameters(body)
       return callback(new errors.ParameterError('Invalid LTI parameters'), false)
 
-    @_valid_oauth req, body, callback
+    @_valid_oauth isProvider, req, body, callback
 
 
   # Helper to validate basic LTI parameters
@@ -69,15 +69,18 @@ class Provider
   # Helper to validate the OAuth information in the request
   #
   # Returns true/false if is valid OAuth signatue and nonce
-  _valid_oauth: (req, body, callback) ->
+  _valid_oauth: (isProvider, req, body, callback) ->
     generated = @signer.build_signature req, body, @consumer_secret
-    valid_signature = generated is body.oauth_signature
-    return callback new errors.SignatureError('Invalid Signature'), false if not valid_signature
-    @nonceStore.isNew body.oauth_nonce, body.oauth_timestamp, (err, valid) ->
-      if not valid
-        callback new errors.NonceError('Expired nonce'), false
-      else
-        callback null, true
+    if isProvider
+      valid_signature = generated is body.oauth_signature
+      return callback new errors.SignatureError('Invalid Signature'), false if not valid_signature
+      @nonceStore.isNew body.oauth_nonce, body.oauth_timestamp, (err, valid) ->
+        if not valid
+          callback new errors.NonceError('Expired nonce'), false
+        else
+          callback null, true
+    else
+      return generated
 
 
   # Stores the request's properties into the @body accessor
