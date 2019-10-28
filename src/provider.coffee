@@ -80,7 +80,7 @@ class Provider
         else
           callback null, true
     else
-      return generated
+      callback null, generated
 
 
   # Stores the request's properties into the @body accessor
