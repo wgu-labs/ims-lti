@@ -1,6 +1,6 @@
 {
   "name": "@wgulabs/ims-lti",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "Module for building an LTI Tool Provider and accept LTI launch requests",
   "author": "James Rundquist <james@courseshark.com>",
   "contributors": [
